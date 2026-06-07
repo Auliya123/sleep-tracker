@@ -57,6 +57,17 @@ func validJam(j string) bool {
 	return hh >= 0 && hh <= 23 && mm >= 0 && mm <= 59
 }
 
+func tanggalJamKeMenit(tanggal, jam string) int {
+	var dd, mm, yyyy int
+	var hh, menit int
+
+	fmt.Sscanf(tanggal, "%d-%d-%d", &dd, &mm, &yyyy)
+	fmt.Sscanf(jam, "%d:%d", &hh, &menit)
+
+	// cukup untuk perbandingan
+	return (((yyyy*12+mm)*31+dd)*24+hh)*60 + menit
+}
+
 func hitungDurasi(jamTidur, jamBangun string) int {
 	var jt, mt, jb, mb int
 	fmt.Sscanf(jamTidur, "%d:%d", &jt, &mt)
@@ -167,34 +178,36 @@ func tambahData() {
 
 		// input tanggal bangun
 		valid = false
+
 		for !valid {
+
+			// input tanggal bangun
 			tglBangun = inputString("Tanggal bangun (dd-mm-yyyy): ")
 
-			if validTanggal(tglBangun) {
-				valid = true
-			} else {
+			if !validTanggal(tglBangun) {
 				fmt.Println("Format salah!")
+				continue
 			}
-		}
 
-		// input jam bangun + validasi durasi
-		valid = false
-		for !valid {
+			// input jam bangun
 			jamBangun = inputString("Jam bangun (HH:MM): ")
 
-			if validJam(jamBangun) {
-
-				durasi = hitungDurasi(jamTidur, jamBangun)
-
-				if durasi > 0 {
-					valid = true
-				} else {
-					fmt.Println("Jam bangun harus setelah jam tidur!")
-				}
-
-			} else {
+			if !validJam(jamBangun) {
 				fmt.Println("Format salah!")
+				continue
 			}
+
+			waktuTidur := tanggalJamKeMenit(tglTidur, jamTidur)
+			waktuBangun := tanggalJamKeMenit(tglBangun, jamBangun)
+
+			if waktuBangun <= waktuTidur {
+				fmt.Println("\nTanggal dan jam bangun harus setelah tanggal dan jam tidur!")
+				fmt.Println("Silakan input ulang tanggal dan jam bangun.")
+				continue
+			}
+
+			durasi = (waktuBangun - waktuTidur)
+			valid = true
 		}
 
 		status := tentukanStatus(durasi)
