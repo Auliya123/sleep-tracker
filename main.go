@@ -42,6 +42,13 @@ func validTanggal(t string) bool {
 	return dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12 && yyyy >= 2000
 }
 
+func tanggalKeAngka(tgl string) int {
+	var dd, mm, yyyy int
+	fmt.Sscanf(tgl, "%d-%d-%d", &dd, &mm, &yyyy)
+
+	return yyyy*10000 + mm*100 + dd
+}
+
 func validJam(j string) bool {
 	if len(j) != 5 {
 		return false
@@ -342,7 +349,8 @@ func sortByTanggalAscUntukBS(arr [NMAX]DataTidur, n int) [NMAX]DataTidur {
 	for i := 0; i < n-1; i++ {
 		minIdx := i
 		for j := i + 1; j < n; j++ {
-			if arr[j].tglTidur < arr[minIdx].tglTidur {
+			if tanggalKeAngka(arr[j].tglTidur) <
+				tanggalKeAngka(arr[minIdx].tglTidur) {
 				minIdx = j
 			}
 		}
@@ -361,9 +369,12 @@ func binarySearch(tgl string) int {
 
 	for low <= high && idxSorted == -1 {
 		mid := (low + high) / 2
-		if sortedArr[mid].tglTidur == tgl {
+		target := tanggalKeAngka(tgl)
+		midVal := tanggalKeAngka(sortedArr[mid].tglTidur)
+
+		if midVal == target {
 			idxSorted = mid
-		} else if tgl < sortedArr[mid].tglTidur {
+		} else if target < midVal {
 			high = mid - 1
 		} else {
 			low = mid + 1
@@ -400,9 +411,9 @@ func selectionSort(arr [NMAX]DataTidur, n int, byDurasi bool, asc bool) [NMAX]Da
 				}
 			} else {
 				if asc {
-					lebihPrioritas = arr[j].tglTidur < arr[idxPilih].tglTidur
+					lebihPrioritas = tanggalKeAngka(arr[j].tglTidur) < tanggalKeAngka(arr[idxPilih].tglTidur)
 				} else {
-					lebihPrioritas = arr[j].tglTidur > arr[idxPilih].tglTidur
+					lebihPrioritas = tanggalKeAngka(arr[j].tglTidur) > tanggalKeAngka(arr[idxPilih].tglTidur)
 				}
 			}
 			if lebihPrioritas {
@@ -430,9 +441,9 @@ func insertionSort(arr [NMAX]DataTidur, n int, byDurasi bool, asc bool) [NMAX]Da
 				}
 			} else {
 				if asc {
-					harusGeser = arr[j].tglTidur > key.tglTidur
+					harusGeser = tanggalKeAngka(arr[j].tglTidur) > tanggalKeAngka(key.tglTidur)
 				} else {
-					harusGeser = arr[j].tglTidur < key.tglTidur
+					harusGeser = tanggalKeAngka(arr[j].tglTidur) < tanggalKeAngka(key.tglTidur)
 				}
 			}
 			if harusGeser {
